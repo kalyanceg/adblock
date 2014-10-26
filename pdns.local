@@ -1,0 +1,16 @@
+# Here come the local changes the user made, like configuration of 
+# the several backends that exist.
+guardian=yes
+launch=pipe
+loglevel=10
+local-address=<ip addresses you need to bind dns separated by comma>
+out-of-zone-additional-processing=no
+pipebackend-abi-version=2
+pipe-command=/etc/powerdns/db_backend
+version-string=anonymous
+webserver=no
+distributor-threads=2
+#receiver-threads=5
+cache-ttl=300
+query-cache-ttl=3600
+ 
