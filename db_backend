@@ -1,0 +1,53 @@
+#!/usr/bin/python
+from sys import stdin, stdout,stderr
+from dns import resolver
+f=open('/etc/powerdns/domains')
+content = f.readlines()
+f.close
+hs=stdin.readline()
+stdout.write("OK\tbanner\n")
+stdout.flush();
+while True:
+ f=0
+ b=0
+ s=0
+ query=stdin.readline().strip();
+ sp = query.split()
+ if(sp[0]=="AXFR" or sp[0]=="PING"):
+  s=1
+   
+ 
+ else:
+  for domain in content:
+   domain=domain.strip()
+   if(sp[1]==domain or sp[1].endswith("."+domain)):
+    print "FAIL"
+    f=1
+    b=1
+    break
+ if b==0 and s==0:
+   res = resolver.Resolver()
+   res.nameservers = ['8.8.8.8']
+   try:
+    if (sp[3]!="SOA"):
+     if sp[3]=="ANY":
+      sp[3]="A"     
+     answers = res.query(sp[1],sp[3])
+     for record in answers.rrset:
+      print "DATA\t" + sp[1] + "\t" + sp[2] + "\t"+sp[3]+"\t60\t-1\t"+str(record)
+    else:
+#     print "DATA\t" + sp[1] + "\t" + sp[2] + "\t"+sp[3]+"\t60\t-1\tlocalhost 2008080300 1800 3600 604800 3600"
+      raise Exception("SOA alert")
+   except:
+    try:
+     answers = res.query(sp[1], 'SOA')
+     for record in answers.rrset:
+      print "DATA\t" + sp[1] + "\t" + sp[2] + "\tSOA\t60\t1\t"+str(record)
+    except:
+     pass
+    
+
+   stdout.flush()
+ if f==0:
+  print "END"
+ stdout.flush();
